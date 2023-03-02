@@ -1,0 +1,180 @@
+#!/bin/sh
+# PROVIDE: litecoin_testnet
+# REQUIRE: LOGIN cleanvar
+# KEYWORD: shutdown
+
+#
+# Add the following lines to /etc/rc.conf to enable :
+# litecoin_testnet_enable (bool):	Set to "NO" by default.
+#				Set it to "YES" to enable litecoin
+# litecoin_testnet_user (str)		Set to "litecoin" by default.
+# litecoin_testnet_group (str)		Set to "litecoin" by default.
+# litecoin_testnet_conf (str)		Set to "/litecoin/litecoin.conf" by default.
+# litecoin_testnet_data_dir (str)	Set to "/var/db/litecoin" by default.
+# litecoin_testnet_syslog_facility(str)	Set to "local0" by default.
+# litecoin_testnet_syslog_priority(str)	Set to "info" by default.
+# litecoinlimits_enable (bool)	Set to "NO" by default.
+#				Set it to "YES" to enable litecoinlimits
+# litecoinlimits_args		Set to "-e -U ${litecoin_testnet_user}" by default
+
+
+. /etc/rc.subr
+
+name="litecoin_testnet"
+rcvar=litecoin_testnet_enable
+
+start_precmd="litecoin_testnet_precmd"
+start_cmd="litecoin_testnet_start"
+restart_precmd="litecoin_testnet_checkconfig"
+reload_precmd="litecoin_testnet_checkconfig"
+configtest_cmd="litecoin_testnet_checkconfig"
+status_cmd="litecoin_testnet_status"
+stop_cmd="litecoin_testnet_stop"
+stop_postcmd="litecoin_testnet_wait"
+command="/usr/local/bin/litecoind"
+daemon_command="/usr/sbin/daemon"
+extra_commands="configtest"
+pidfile="/litecoin/litecoin.pid"
+
+: ${litecoin_testnet_enable:="NO"}
+: ${litecoinlimits_enable:="NO"}
+
+load_rc_config ${name}
+
+: ${litecoin_testnet_user:="litecoin"}
+: ${litecoin_testnet_group:="litecoin"}
+: ${litecoin_testnet_data_dir:="/litecoin"}
+: ${litecoin_testnet_config_file:="/litecoin/litecoin.conf"}
+: ${litecoin_testnet_syslog_facility:="local0"}
+: ${litecoin_testnet_syslog_priority:="info"}
+: ${litecoin_testnet_syslog_tag:="litecoin"}
+: ${litecoin_testnet_kill_after:="300"}
+: ${litecoinlimits_args:="-e -U ${litecoin_testnet_user}"}
+
+# set up dependant variables
+procname="${command}"
+required_files="${litecoin_testnet_config_file}"
+pidfile="${litecoin_testnet_data_dir}/testnet3/litecoind.pid"
+
+litecoin_testnet_checkconfig()
+{
+  echo "Performing sanity check on litecoin configuration:"
+  if [ ! -d "${litecoin_testnet_data_dir}" ]
+  then
+    echo "Missing data directory: ${litecoin_testnet_data_dir}"
+    exit 1
+  fi
+  chown -R "${litecoin_testnet_user}:${litecoin_testnet_group}" "${litecoin_testnet_data_dir}"
+
+  if [ ! -f "${litecoin_testnet_config_file}" ]
+  then
+    echo "Missing configuration file: ${litecoin_testnet_config_file}"
+    exit 1
+  fi
+  if [ ! -x "${command}" ]
+  then
+    echo "Missing executable: ${command}"
+    exit 1
+  fi
+  return 0
+}
+
+litecoin_testnet_cleanup()
+{
+  rm -f "${pidfile}"
+}
+
+litecoin_testnet_precmd()
+{
+  litecoin_testnet_checkconfig
+
+  pid=$(check_pidfile "${pidfile}" "${procname}")
+  if [ -z "${pid}" ]
+  then
+    echo "Litecoind is not running"
+    rm -f "${pidfile}"
+  fi
+
+  if checkyesno litecoinlimits_enable
+  then
+    eval $(/usr/bin/limits ${litecoinlimits_args}) 2>/dev/null
+  else
+    return 0
+  fi
+}
+
+litecoin_testnet_status()
+{
+  local pid
+  pid=$(check_pidfile "${pidfile}" "${procname}")
+  if [ -z "${pid}" ]
+  then
+    echo "Litecoind is not running"
+    return 1
+  else
+    echo "Litecoind running, pid: ${pid}"
+  fi
+}
+
+litecoin_testnet_start()
+{
+  echo "Starting litecoin:"
+  cd "${litecoin_testnet_data_dir}" || return 1
+  ${daemon_command} \
+    -u "${litecoin_testnet_user}" \
+    -l "${litecoin_testnet_syslog_facility}" \
+    -s "${litecoin_testnet_syslog_priority}" \
+    -T "${litecoin_testnet_syslog_tag}" \
+    ${command} \
+    -testnet \
+    -printtoconsole=1 \
+    -conf="${litecoin_testnet_config_file}" \
+    -datadir="${litecoin_testnet_data_dir}"
+}
+
+litecoin_testnet_stop()
+{
+  echo "Stopping litecoin:"
+  pid=$(check_pidfile "${pidfile}" "${procname}")
+  if [ -z "${pid}" ]
+  then
+    echo "Litecoind is not running"
+    return 1
+  else
+    kill ${pid}
+  fi
+}
+
+litecoin_testnet_wait()
+{
+  local n="${litecoin_testnet_kill_after}"
+  echo "Waiting for litecoin shutdown:"
+  while :
+  do
+    printf '.'
+    pid=$(check_pidfile "${pidfile}" "${procname}")
+    if [ -z "${pid}" ]
+    then
+      printf '\n'
+      break
+    fi
+    sleep 1
+    n=$((${n} - 1))
+    if [ ${n} -eq 0 -a -f "${pidfile}" ]
+    then
+      printf "\nForce shutdown"
+      kill -9 $(cat "${pidfile}")
+      for n in 1 2 3
+      do
+        printf '.'
+        sleep 1
+      done
+      printf '\n'
+      break
+    fi
+  done
+  rm -f "${pidfile}"
+  echo "Shutdown complete"
+}
+
+run_rc_command "$1"
