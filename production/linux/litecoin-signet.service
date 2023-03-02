@@ -1,0 +1,22 @@
+[Unit]
+Description=Litecoind-signet
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/litecoind -conf=litecoin.conf -daemon -signet -printtoconsole -pid=/litecoin/litecoind-signet.pid
+ExecStop=/usr/local/bin/litecoin-cli -signet stop
+
+Type=forking
+PIDFile=/litecoin/litecoind-signet.pid
+Restart=on-failure
+
+User=litecoin
+Group=litecoin
+
+PrivateTmp=true
+ProtectSystem=full
+NoNewPrivileges=true
+PrivateDevices=true
+
+[Install]
+WantedBy=multi-user.target
