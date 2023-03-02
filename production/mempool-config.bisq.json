@@ -31,6 +31,6 @@
   },
   "BISQ": {
     "ENABLED": true,
-    "DATA_PATH": "/bisq/statsnode-data/btc_mainnet/db"
+    "DATA_PATH": "/bisq/statsnode-data/ltc_mainnet/db"
   }
 }
