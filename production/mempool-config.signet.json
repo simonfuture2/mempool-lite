@@ -16,9 +16,9 @@
     "MIN_PRIORITY": "debug"
   },
   "CORE_RPC": {
-    "PORT": 38332,
-    "USERNAME": "__BITCOIN_RPC_USER__",
-    "PASSWORD": "__BITCOIN_RPC_PASS__"
+    "PORT": 39332,
+    "USERNAME": "__LITECOIN_RPC_USER__",
+    "PASSWORD": "__LITECOIN_RPC_PASS__"
   },
   "ESPLORA": {
     "REST_API_URL": "http://127.0.0.1:4003"
