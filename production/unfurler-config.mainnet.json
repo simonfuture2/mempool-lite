@@ -1,12 +1,12 @@
 {
   "SERVER": {
     "HOST": "https://mempool.fra.mempool.space",
-    "HTTP_PORT": 8001
+    "HTTP_PORT": 9001
   },
   "MEMPOOL": {
     "HTTP_HOST": "http://127.0.0.1",
     "HTTP_PORT": 81,
-    "NETWORK": "bitcoin"
+    "NETWORK": "litecoin"
   },
   "PUPPETEER": {
     "CLUSTER_SIZE": 8,
