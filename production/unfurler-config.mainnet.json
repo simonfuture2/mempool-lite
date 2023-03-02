@@ -5,7 +5,7 @@
   },
   "MEMPOOL": {
     "HTTP_HOST": "http://127.0.0.1",
-    "HTTP_PORT": 81,
+    "HTTP_PORT": 91,
     "NETWORK": "litecoin"
   },
   "PUPPETEER": {
