@@ -1,13 +1,13 @@
 [Unit]
-Description=Bitcoind-minfee
+Description=litecoind-minfee
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/bitcoind -daemon -printtoconsole -pid=/minfee/bitcoind-minfee.pid
-ExecStop=/usr/local/bin/bitcoin-cli stop
+ExecStart=/usr/local/bin/litecoind -daemon -printtoconsole -pid=/minfee/litecoind-minfee.pid
+ExecStop=/usr/local/bin/litecoin-cli stop
 
 Type=forking
-PIDFile=/minfee/bitcoind.pid
+PIDFile=/minfee/litecoind.pid
 Restart=on-failure
 
 User=minfee
