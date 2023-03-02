@@ -6,8 +6,8 @@ LOCKFILE="${HOME}/lock"
 REF=$(echo "${1:=origin/master}"|sed -e 's!:!/!')
 
 # get rpc credentials
-BITCOIN_RPC_USER=$(grep '^rpcuser' /bitcoin/bitcoin.conf | cut -d '=' -f2)
-BITCOIN_RPC_PASS=$(grep '^rpcpassword' /bitcoin/bitcoin.conf | cut -d '=' -f2)
+LITECOIN_RPC_USER=$(grep '^rpcuser' /litecoin/litecoin.conf | cut -d '=' -f2)
+LITECOIN_RPC_PASS=$(grep '^rpcpassword' /litecoin/litecoin.conf | cut -d '=' -f2)
 ELEMENTS_RPC_USER=$(grep '^rpcuser' /elements/elements.conf | cut -d '=' -f2)
 ELEMENTS_RPC_PASS=$(grep '^rpcpassword' /elements/elements.conf | cut -d '=' -f2)
 
@@ -88,8 +88,8 @@ build_backend()
     if [ ! -e "mempool-config.json" ];then
         cp "${HOME}/mempool/production/mempool-config.${site}.json" "mempool-config.json"
 	sed -i .orig \
-	-e "s!__BITCOIN_RPC_USER__!${BITCOIN_RPC_USER}!" \
-	-e "s!__BITCOIN_RPC_PASS__!${BITCOIN_RPC_PASS}!" \
+	-e "s!__LITECOIN_RPC_USER__!${LITECOIN_RPC_USER}!" \
+	-e "s!__LITECOIN_RPC_PASS__!${LITECOIN_RPC_PASS}!" \
 	-e "s!__ELEMENTS_RPC_USER__!${ELEMENTS_RPC_USER}!" \
 	-e "s!__ELEMENTS_RPC_PASS__!${ELEMENTS_RPC_PASS}!" \
         -e "s!__MEMPOOL_MAINNET_USER__!${MEMPOOL_MAINNET_USER}!" \
