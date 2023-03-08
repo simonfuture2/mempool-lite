@@ -4,7 +4,7 @@ https://user-images.githubusercontent.com/232186/222445818-234aa6c9-c233-4c52-b3
 
 Mempool is the fully-featured mempool visualizer, explorer, and API service running at [mempool.space](https://mempool.space/). 
 
-It is an open-source project developed and operated for the benefit of the Bitcoin community, with a focus on the emerging transaction fee market that is evolving Bitcoin into a multi-layer ecosystem.
+It is an open-source project developed and operated for the benefit of the Litecoin community, with a focus on the emerging transaction fee market that is evolving Litecoin into a multi-layer ecosystem.
 
 ![mempool](https://mempool.space/resources/screenshots/v2.4.0-dashboard.png)
 
